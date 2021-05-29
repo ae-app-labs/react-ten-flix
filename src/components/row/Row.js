@@ -1,18 +1,73 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import YouTube from 'react-youtube'
+import { API_KEY, IMAGE_URL } from '../../constants/constants'
+import service from '../../service'
 import "./Row.css"
 
-function Row() {
+function Row(props) {
+
+    const [results, setResults] = useState([])
+    const [showTrailer, setShowTrailer] = useState(false)
+    const [videoId, setVideoId] = useState("")
+
+    useEffect(() => {
+        service.get(props.url).then( response => {
+            console.log(response.data.results[0])
+            setResults(response.data.results)
+        })
+        .catch(error => {
+            alert(error)
+        })
+    }, [])
+
+    const options = {
+        width: '100%'
+    }
+
+    const showMovieTrailer = (movieId) => {
+        const url = `/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`
+        service.get(url)
+            .then( response => {
+                if(response.data.results.length > 0){
+                    //console.log(response.data.results[0].key)
+                    setVideoId(response.data.results[0].key)
+                    setShowTrailer(true)
+                } else {
+                    setShowTrailer(false)
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
     return (
         <div className="row">
-            <h2>Title</h2>
+            <h2>{props.title}</h2>
             <div className="posters">
-                <img className="poster" src="https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w" alt="poster" />
-                <img className="poster" src="https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w" alt="poster" />
-                <img className="poster" src="https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w" alt="poster" />
-                <img className="poster" src="https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w" alt="poster" />
-                <img className="poster" src="https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w" alt="poster" />
-                <img className="poster" src="https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w" alt="poster" />
+            {
+                results.map( result => {
+                    return (
+                        <div>
+<img 
+    className={ props.isSmall? 'poster-small' : 'poster'} 
+    src={`${IMAGE_URL+result.backdrop_path}`} 
+    onClick={ () => showMovieTrailer(result.id)}
+    alt="poster"/>
+                        <h3>{result.name?result.name:result.original_title}</h3>
+                        </div>
+                    )
+                })
+            }
             </div>
+            
+            { 
+                showTrailer && 
+                    <YouTube 
+                        opts={options}
+                        videoId={videoId}/>
+            }
+                
         </div>
     )
 }
